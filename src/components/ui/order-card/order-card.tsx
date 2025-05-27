@@ -1,17 +1,18 @@
-import React, { FC, memo } from 'react';
-import { Link } from 'react-router-dom';
-import {
-  CurrencyIcon,
-  FormattedDate
-} from '@zlden/react-developer-burger-ui-components';
+import { FC, memo } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+
+import { OrderCardUIProps } from './type';
+import { CurrencyIcon, FormattedDate } from '@zlden/react-developer-burger-ui-components';
+import { OrderStatus } from '@components';
 
 import styles from './order-card.module.css';
 
-import { OrderCardUIProps } from './type';
-import { OrderStatus } from '@components';
+const maxIngredients = 6;
 
-export const OrderCardUI: FC<OrderCardUIProps> = memo(
-  ({ orderInfo, maxIngredients, locationState }) => (
+export const OrderCardUI: FC<OrderCardUIProps> = memo(({ orderInfo, maxIngredients, locationState }) => {
+  const location = useLocation();
+
+  return (
     <Link
       to={orderInfo.number.toString()}
       relative='path'
@@ -75,5 +76,5 @@ export const OrderCardUI: FC<OrderCardUIProps> = memo(
         </div>
       </div>
     </Link>
-  )
-);
+  );
+});

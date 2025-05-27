@@ -1,33 +1,30 @@
+import { Preloader } from '@ui';
 import { ProfileOrdersUI } from '@ui-pages';
 import { TOrder } from '@utils-types';
 import { FC, useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { getOrdersList, selectIsOrdersListLoading, selectOrders } from '../../services/slices/order-slice';
-import { useDispatch } from '../../services/store';
-import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from '../../services/store';
+import { getOrdersList, selectOrders, selectIsOrdersListLoading } from '../../services/slices/order-slice';
 
 export const ProfileOrders: FC = () => {
-  const orders: TOrder[] = useSelector(selectOrders);
-  const isOrdersLoading = useSelector(selectIsOrdersListLoading);
+  const orders = useSelector(selectOrders);
+  const isLoading = useSelector(selectIsOrdersListLoading);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(getOrdersList());
   }, [dispatch]);
 
-  const handleOrderClick = (number: number) => {
-    navigate(`/profile/orders/${number}`);
-  };
+  if (isLoading) {
+    return <Preloader />;
+  }
 
-  if (isOrdersLoading) {
-    return <h1>Загрузка</h1>;
+  if (!orders.length) {
+    return <div>Нет доступных заказов</div>;
   }
 
   return (
     <ProfileOrdersUI 
-      orders={orders} 
-      handleOrderClick={handleOrderClick}
+      orders={orders}
     />
   );
 };

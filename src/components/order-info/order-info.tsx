@@ -1,61 +1,40 @@
-import { FC, useMemo } from 'react';
-import { Preloader } from '../ui/preloader';
-import { OrderInfoUI } from '../ui/order-info';
+import { FC, useEffect, useMemo } from 'react';
+import { Preloader } from '@ui';
+import { OrderInfoUI } from '@ui';
 import { TIngredient } from '@utils-types';
-import { useSelector } from '../../services/store';
-import { selectIngredients } from '../../services/slices/ingredients-slice';
-import { selectOrderModalData } from '../../services/slices/order-slice';
 import { useParams } from 'react-router-dom';
-import { getOrderByNumberApi } from '../../utils/burger-api';
-import { useEffect, useState } from 'react';
-
-type TOrderData = {
-  createdAt: string;
-  ingredients: string[];
-  _id: string;
-  status: string;
-  name: string;
-  updatedAt: string;
-  number: number;
-};
-
-type TIngredientsWithCount = {
-  [key: string]: TIngredient & { count: number };
-};
+import { useDispatch, useSelector } from '../../services/store';
+import {
+  fetchOrderByNumber,
+  selectIsNumberOrderLoading,
+  selectOrderModalData
+} from '../../services/slices/order-slice';
+import { selectIngredients } from '../../services/slices/ingredients-slice';
 
 export const OrderInfo: FC = () => {
   const { number } = useParams();
-  const [orderData, setOrderData] = useState<TOrderData | null>(null);
-  const ingredients = useSelector(selectIngredients);
-  const orderModalData = useSelector(selectOrderModalData);
+  if (!number) return <h1>No number</h1>;
+  
+  const isLoading = useSelector(selectIsNumberOrderLoading);
+  const dispatch = useDispatch();
+  const orderData = useSelector(selectOrderModalData);
+  const ingredients: TIngredient[] = useSelector(selectIngredients);
 
   useEffect(() => {
-    const fetchOrder = async () => {
-      try {
-        const response = await getOrderByNumberApi(Number(number));
-        if (response.success) {
-          setOrderData(response.data[0]);
-        }
-      } catch (error) {
-        console.error('Failed to fetch order:', error);
-      }
-    };
+    dispatch(fetchOrderByNumber(+number));
+  }, [number, dispatch]);
 
-    if (number) {
-      fetchOrder();
-    } else if (orderModalData) {
-      setOrderData(orderModalData);
-    }
-  }, [number, orderModalData]);
-
-  /* Готовим данные для отображения */
   const orderInfo = useMemo(() => {
     if (!orderData || !ingredients.length) return null;
 
     const date = new Date(orderData.createdAt);
 
+    type TIngredientsWithCount = {
+      [key: string]: TIngredient & { count: number };
+    };
+
     const ingredientsInfo = orderData.ingredients.reduce(
-      (acc: TIngredientsWithCount, item: string) => {
+      (acc: TIngredientsWithCount, item) => {
         if (!acc[item]) {
           const ingredient = ingredients.find((ing) => ing._id === item);
           if (ingredient) {
@@ -67,14 +46,13 @@ export const OrderInfo: FC = () => {
         } else {
           acc[item].count++;
         }
-
         return acc;
       },
       {}
     );
 
     const total = Object.values(ingredientsInfo).reduce(
-      (acc: number, item: TIngredient & { count: number }) => acc + item.price * item.count,
+      (acc, item) => acc + item.price * item.count,
       0
     );
 
@@ -86,7 +64,7 @@ export const OrderInfo: FC = () => {
     };
   }, [orderData, ingredients]);
 
-  if (!orderInfo) {
+  if (!orderInfo || isLoading) {
     return <Preloader />;
   }
 
