@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector } from '../../services/store';
 import { selectIsAuthed } from '../../services/slices/user-slice';
 
 interface ProtectedRouteProps {

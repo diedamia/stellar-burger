@@ -29,13 +29,17 @@ const constructorSlice = createSlice({
         state.constructorItems.bun = action.payload;
     },
     // добавляем ингредиент
-    addIngredient(state, action: PayloadAction<TIngredient>){
-        const ingredient = {...action.payload, id: uuidv4()};
-        if (action.payload.type === 'bun'){
-            state.constructorItems.bun = ingredient;
-            return;
+    addIngredient: {
+        prepare: (ingredient: TIngredient) => ({ 
+            payload: { 
+                ...ingredient, 
+                id: uuidv4(),
+                uniqueId: uuidv4() 
+            } 
+        }),
+        reducer(state, action: PayloadAction<TConstructorIngredient>) {
+            state.constructorItems.ingredients.push(action.payload);
         }
-        state.constructorItems.ingredients.push(ingredient);
     },
     // удаляем ингредиент
     deleteIngredient(
