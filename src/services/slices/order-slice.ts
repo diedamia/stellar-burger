@@ -31,8 +31,13 @@ export const createOrder = createAsyncThunk<TNewOrderResponse, string[]>("order/
 
 // получаем заказ по номеру
 export const fetchOrderByNumber = createAsyncThunk<TOrder, number>("order/getOrder", async(num, {rejectWithValue}) =>{
+    console.log('Fetching order by number:', num);
     const data = await getOrderByNumberApi(num);
-    if(!data.success) return rejectWithValue(data);
+    console.log('API response:', data);
+    if(!data.success) {
+        console.error('API error:', data);
+        return rejectWithValue(data);
+    }
     return data.data[0];
 });
 

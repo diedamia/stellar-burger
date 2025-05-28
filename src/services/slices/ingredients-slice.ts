@@ -71,5 +71,6 @@ export const selectMains = (state: RootState) => state.ingredients.mains;
 export const selectSauces = (state: RootState) => state.ingredients.sauces;
 export const selectIsLoading = (state: RootState) =>
   state.ingredients.isLoading;
+export const selectIsIngredientsLoading = (state: RootState) => state.ingredients.isLoading;
 
 export default ingredientsSlice.reducer; 

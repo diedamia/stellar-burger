@@ -18,6 +18,7 @@ export type OrderCardUIProps = {
   };
   maxIngredients: number;
   locationState: { background: Location };
+  onClick?: () => void;
 };
 
 type TOrderInfo = {
