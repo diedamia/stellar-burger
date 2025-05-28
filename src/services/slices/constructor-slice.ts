@@ -24,9 +24,9 @@ const constructorSlice = createSlice({
   reducers: {
     // добавляем булочку
     addBun(state, action: PayloadAction<TIngredient>) {
-        if (action.payload.type === 'bun') 
+        if (action.payload.type !== 'bun') 
             return;
-         state.constructorItems.bun = action.payload;
+        state.constructorItems.bun = action.payload;
     },
     // добавляем ингредиент
     addIngredient(state, action: PayloadAction<TIngredient>){
@@ -85,11 +85,11 @@ const constructorSlice = createSlice({
 
 // функции для получения данных из стора
 export const selectConstructorItems = (state: RootState) =>
-  state.builder.constructorItems;
+  state.burgerConstructor.constructorItems;
 export const selectBun = (state: RootState) =>
-  state.builder.constructorItems.bun;
+  state.burgerConstructor.constructorItems.bun;
 export const selectConstructorTotalCount = (state: RootState) =>
-  state.builder.constructorItems.ingredients.length;
+  state.burgerConstructor.constructorItems.ingredients.length;
 
 export const {
   addBun,

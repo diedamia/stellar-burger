@@ -9,23 +9,31 @@ import {
   selectIsNumberOrderLoading,
   selectOrderModalData
 } from '../../services/slices/order-slice';
-import { selectIngredients } from '../../services/slices/ingredients-slice';
+import { selectIngredients, selectIsIngredientsLoading } from '../../services/slices/ingredients-slice';
 
 export const OrderInfo: FC = () => {
   const { number } = useParams();
   if (!number) return <h1>No number</h1>;
   
   const isLoading = useSelector(selectIsNumberOrderLoading);
+  const isIngredientsLoading = useSelector(selectIsIngredientsLoading);
   const dispatch = useDispatch();
   const orderData = useSelector(selectOrderModalData);
   const ingredients: TIngredient[] = useSelector(selectIngredients);
 
   useEffect(() => {
-    dispatch(fetchOrderByNumber(+number));
-  }, [number, dispatch]);
+    console.log('OrderInfo component mounted, number:', number);
+    if (!isIngredientsLoading) {
+      dispatch(fetchOrderByNumber(+number));
+    }
+  }, [number, dispatch, isIngredientsLoading]);
 
   const orderInfo = useMemo(() => {
-    if (!orderData || !ingredients.length) return null;
+    console.log('Calculating orderInfo:', { orderData, ingredients });
+    if (!orderData || !ingredients.length) {
+      console.log('Missing data:', { orderData, ingredients });
+      return null;
+    }
 
     const date = new Date(orderData.createdAt);
 
@@ -64,7 +72,7 @@ export const OrderInfo: FC = () => {
     };
   }, [orderData, ingredients]);
 
-  if (!orderInfo || isLoading) {
+  if (!orderInfo || isLoading || isIngredientsLoading) {
     return <Preloader />;
   }
 
